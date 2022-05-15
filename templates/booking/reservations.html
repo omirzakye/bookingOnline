@@ -1,0 +1,130 @@
+{% extends "booking/base.html" %}
+{% block content %}
+{#<h2><br>My reservations are:</h2>#}
+{#    {% if my_reservations %}#}
+{#    <div class="row" style="padding-left: 4%; padding-right: 4%">#}
+{#        {% for rest in my_restaurants %}#}
+{#            <h3>{{ name }}</h3>#}
+{#        <div class="col-lg-3" style="margin-top: 1%">#}
+{#            <img class="thumbnail" src="{{rest.photos}}">#}
+{#            <div class="box-element product">#}
+{#                <h3><strong><a href="#">{{rest.name}}</a></strong></h3>#}
+{#                <hr>#}
+{#                <h4 style="display: inline-block;"><strong>Number of seats: {{rest.total_seats}}</strong></h4>#}
+{#                <h4 style="display: inline-block;"><strong><a href="{{rest.address}}">Address</a> </strong></h4>#}
+{#                <h4 style="display: inline-block;"><strong>Open-time: {{rest.open_time}}</strong></h4>#}
+{#                <h4 style="display: inline-block;"><strong>Close-time: {{rest.close_time}}</strong></h4>#}
+{#                <h4 style="display: inline-block;"><strong><a href="{{rest.address}}">Instagram</a></strong></h4>#}
+{#                <h6><strong><a href="{% url 'restaurant' rest.id %}">Reserve</a></strong></h6>#}
+{#            </div>#}
+{#        </div>#}
+{#        {% endfor %}#}
+{#    </div>#}
+{#    {% else %}#}
+{#        <h1>{{ request.user_id }}</h1>#}
+{#        <h2>{{ name }}</h2>#}
+{#        <h2>{{ surname }}</h2>#}
+{#        <h2>{{ available }}</h2>#}
+{#        <h2>{{ date }}</h2>#}
+{#        <h2>{{ time }}</h2>#}
+{#        {% if myReservations %}#}
+{#            {% for resv in myReservations %}#}
+{#                <h2>{{ resv.restaurant_id }}</h2>#}
+{#            {% endfor %}#}
+{#            {% else %}#}
+{#            <h2>No reservations!</h2>#}
+{#            {% endif %}#}
+{#    {% endif %}#}
+    <div class="container w-75 mt-5" style="margin-bottom: 190px;">
+		<div class="mt-5 content-section">
+			{% if reservations %}
+			<h5>Upcoming Reservations</h5>
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th scope="col">#</th>
+						<th scope="col">Restaurant</th>
+						<th scope="col"><i class="fa fa-calendar w3-text-blue"></i> Date</th>
+						<th scope="col"><i class="fa fa-user w3-text-blue"></i> Party</th>
+						<th scope="col"><i class="fa fa-clock-o w3-text-blue"></i> Time Start</th>
+						<th scope="col"><i class="fa fa-clock-o w3-text-blue"></i> Time End</th>
+						<th scope="col"><i class="fa fa-clock-o w3-text-blue"></i> Reserver Name</th>
+						<th scope="col"><i class="fa fa-clock-o w3-text-blue"></i> </th>
+						<th scope="col"><i class="fa fa-clock-o w3-text-blue"></i> Email </th>
+						<th scope="col"><i class="fa fa-clock-o w3-text-blue"></i> Phone</th>
+						<th scope="col"><i class="fa fa-clock-o w3-text-blue"></i> Special Request</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for reservation in reservations %}
+                        {% if reservation.reserve_date > today %}
+                        <tr onmousedown="window.location='#';">
+                            <td>{{reservation.id}}</td>
+                            <td>{{reservation.restaurant.name}}</td>
+                            <td>{{reservation.reserve_date}}</td>
+                            <td scope="row">
+                                {{reservation.number_of_people}}
+                                {% if reservation.number_of_people > 1 %}
+                                people
+                                {% else %}
+                                person
+                                {% endif%}
+                            </td>
+                            <td>{{reservation.reserve_time_start}}</td>
+                            <td>{{reservation.reserve_time_end}}</td>
+                            <td>{{reservation.reserverFname}}</td>
+                            <td>{{reservation.reserverLname}}</td>
+                            <td>{{reservation.email}}</td>
+                            <td>{{reservation.phone}}</td>
+                            <td>{{reservation.specialRequest}}</td>
+                            <td><a href="#">Edit</a> <a href="#">Delete</a></td>
+                        </tr>
+                        {% endif %}
+					{% endfor %}
+				</tbody>
+			</table>
+
+			<h5>Already past Reservations</h5>
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th scope="col">#</th>
+						<th scope="col">Restaurant</th>
+						<th scope="col"><i class="fa fa-calendar w3-text-blue"></i> Date</th>
+						<th scope="col"><i class="fa fa-user w3-text-blue"></i> Party</th>
+						<th scope="col"><i class="fa fa-clock-o w3-text-blue"></i> Time</th>
+					</tr>
+				</thead>
+				<tbody>
+                    {% for reservation in reservations %}
+                        {% if reservation.reserve_date < today %}
+                            <tr onmousedown="window.location='#';">
+                            <td>{{reservation.id}}</td>
+                            <td>{{reservation.restaurant.name}}</td>
+                            <td>{{reservation.reserve_date}}</td>
+                            <td scope="row">
+                                {{reservation.number_of_people}}
+                                {% if reservation.number_of_people > 1 %}
+                                people
+                                {% else %}
+                                person
+                                {% endif%}
+                            </td>
+                            <td>{{reservation.reserve_time_start}}</td>
+                            <td>{{reservation.reserve_time_end}}</td>
+                            <td>{{reservation.reserverFname}}</td>
+                            <td>{{reservation.reserverLname}}</td>
+                            <td>{{reservation.email}}</td>
+                            <td>{{reservation.phone}}</td>
+                            <td>{{reservation.specialRequest}}</td>
+                        </tr>
+                        {% endif %}
+					{% endfor %}
+				</tbody>
+			</table>
+			{% else %}
+			<h4>You have no upcoming reservations</h4>
+			{%endif%}
+		</div>
+	</div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "booking/base.html" %}
+{% load static %}
+{% block content %}
+    <div class="wrapper" style="background-image: url('{% static 'images/bg-registration-form-1.jpg' %}')">
+			<div class="inners">
+				<div class="image-holder">
+					<img src={% static 'images/registration-form-1.jpg' %} alt="">
+				</div>
+				<form method="POST">
+                    {% csrf_token %}
+					<h1>Sign in</h1>
+
+                    {% for f in form %}
+                        {{ f }}
+                        <span class="errors">{{ f.errors }}</span>
+                    {% endfor %}
+
+                    <span>Don't have an account?</span>
+                    <a href="{% url 'register' %}">Register</a>
+                    <button style="color: white">Sign In</button>
+			</div>
+		</div>
+</form>
+
+{% endblock %}

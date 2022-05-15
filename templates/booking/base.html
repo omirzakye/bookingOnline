@@ -1,0 +1,85 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+		<title>Booking online</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+        <link rel="stylesheet" href="{% static 'fonts/material-design-iconic-font/css/material-design-iconic-font.min.css' %}">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+
+                    <div class="navbar-header">
+                        <button class="navbar-toggle" data-target="#mobile_menu" data-toggle="collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button>
+                        <a href="#" class="navbar-brand" style="color: orange">Table reservation</a>
+                    </div>
+
+                    <div class="navbar-collapse collapse" id="mobile_menu">
+                        <ul class="nav navbar-nav">
+                            <li ><a href="{% url 'home' %}" style="font-weight: bold">Home</a></li>
+{#                            <li><a href="#" class="dropdown-toggle" data-toggle="dropdown">1 <span class="caret" style="color: orange"></span></a>#}
+{#                                <ul class="dropdown-menu">#}
+{#                                    <li><a href="#">1</a></li>#}
+{#                                    <li><a href="#">2</a></li>#}
+{#                                    <li><a href="#">3</a></li>#}
+{#                                    <li><a href="#">4</a></li>#}
+{#                                    <li><a href="#">5</a></li>#}
+{#                                    <li><a href="#">6</a></li>#}
+{#                                </ul>#}
+{#                            </li>#}
+                            <li><a href="{% url 'reservations' %}">My Reservations</a></li>
+{#                            <li><a href="#">3   </a></li>#}
+                        </ul>
+                        <ul class="nav navbar-nav">
+                            <li>
+                                {# SEARCH bar #}
+                                <form action="{% url 'search_rest_by_name' %}" class="navbar-form" method="post">
+                                    {% csrf_token %}
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <input type="search" name="search_field" id="" placeholder="Search Anything Here..." class="form-control">
+                                            <span class="input-group-addon"><span class="glyphicon glyphicon-search" style="color: orange"></span></span>
+                                        </div>
+                                    </div>
+                                </form>
+                                {#  #}
+                            </li>
+                        </ul>
+                         {%block login%}
+                            {% if user.is_authenticated%}
+                            <ul class="nav navbar-nav navbar-right">
+                                <li>
+                                  <a href="{% url 'logout' %}">Log out</a>
+                                </li>
+                            </ul>
+                            <ul class="nav navbar-nav navbar-right">
+                                <li><h4 style="padding-top: 9%; color: white">{{ user.first_name }}</h4></li>
+                                <li><h4 style="padding-top: 9%; color: white">{{ user.last_name }}</h4></li>
+                            </ul>
+                            {%else%}
+                            <ul class="nav navbar-nav navbar-right">
+                                <li><a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-log-in"></span> Login / Sign Up <span class="caret"></span></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="{% url 'login' %}">Log in</a></li>
+                                        <li><a href="{% url 'register' %}">Register Now</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            {%endif%}
+                        {% endblock %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% block content %}
+
+    {% endblock %}
+</body>
+</html>

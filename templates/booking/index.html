@@ -1,0 +1,25 @@
+{% extends "booking/base.html" %}
+{% block content %}
+<h2><br>All restaurants are:</h2>
+    {% if all_restaurants %}
+    <div class="row" style="padding-left: 4%; padding-right: 4%">
+        {% for rest in all_restaurants %}
+        <div class="col-lg-3" style="margin-top: 1%">
+            <img class="thumbnail" src="{{rest.photos}}">
+            <div class="box-element product">
+                <h3><strong><a href="#">{{rest.name}}</a></strong></h3>
+                <hr>
+                <h4 style="display: inline-block;"><strong>Number of seats: {{rest.total_seats}}</strong></h4>
+                <h4 style="display: inline-block;"><strong><a href="{{rest.address}}">Address</a> </strong></h4>
+                <h4 style="display: inline-block;"><strong>Open-time: {{rest.open_time}}</strong></h4>
+                <h4 style="display: inline-block;"><strong>Close-time: {{rest.close_time}}</strong></h4>
+                <h4 style="display: inline-block;"><strong><a href="{{rest.address}}">Instagram</a></strong></h4>
+                <h6><strong><a href="{% url 'restaurant' rest.id %}">Reserve</a></strong></h6>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        <h2>NO items yet!</h2>
+    {% endif %}
+{% endblock %}
