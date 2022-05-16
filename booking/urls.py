@@ -10,5 +10,8 @@ urlpatterns = [
     path('search/<str:text>/', search_success, name='search_success'),
     path('restaurant/<int:rest_id>/', restaurant, name="restaurant"),
     path('restaurant/<int:idd>/reserve/$', reserve, name='table-reserve'),
-    path('reservations', reservations, name='reservations')
+    path('reservations', reservations, name='reservations'),
+    path('reservations/<int:id>', edit_Res, name='edit_res'),
+    path('reservations/<int:id>/edit', edit_Reservation, name='edit_reservation'),
+    path('reservations/<int:id>/delete', delete_Reservation, name='delete_res'),
 ]

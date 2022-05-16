@@ -22,6 +22,7 @@ class CustomUser(AbstractUser):
 
 
 class Items(models.Model):
+    menu = models.ForeignKey('Menu', models.CASCADE)
     name = models.CharField(max_length=50)
     price = models.IntegerField()
     type = models.CharField(max_length=50)
@@ -36,7 +37,7 @@ class Items(models.Model):
 
 
 class Menu(models.Model):
-    item = models.ForeignKey('Items', models.CASCADE)
+    restaurant = models.ForeignKey('Restaurants', models.CASCADE)
 
     class Meta:
         verbose_name = 'Menu'
@@ -44,7 +45,6 @@ class Menu(models.Model):
 
 
 class Restaurants(models.Model):
-    menu_id = models.ForeignKey('Menu', models.CASCADE)
     name = models.CharField(max_length=50)
     address = models.TextField()
     open_time = models.TimeField()

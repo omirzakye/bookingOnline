@@ -41,6 +41,8 @@ def search_success(request, text):
 
 def restaurant(request, rest_id):
     rt = models.Restaurants.objects.filter(id=rest_id).first()  # restaurant
+    menu = models.Menu.objects.filter(restaurant_id=rest_id).first()
+    items = models.Items.objects.filter(menu_id=menu.id).all()
     context = {
         'name': rt.name,
         'idd': rt.id,
@@ -48,7 +50,8 @@ def restaurant(request, rest_id):
         'available': rt.total_seats - rt.busy_seats,
         'pic': rt.photos,
         'open-time': rt.open_time,
-        'close-time': rt.close_time
+        'close-time': rt.close_time,
+        'menu': items
     }
     return render(request, 'booking/restaurant.html', context)
 
@@ -152,11 +155,41 @@ def reservations(request):
 
 
 @login_required()
+def delete_Reservation(request, id):
+    booking = models.Bookings.objects.filter(id=id).first()
+    booking.delete()
+    messages.info(request, "Reservation successfully deleted!")
+    return redirect('reservations')
+
+
+@login_required()
+def edit_Res(request, id):
+    bk = models.Bookings.objects.filter(id=id).first()  # restaurant
+    context = {
+        'name': bk.restaurant.name,
+        'id': bk.id,
+        'restaurant': bk.restaurant,
+        'available': bk.restaurant.total_seats - bk.restaurant.busy_seats,
+        'open-time': bk.restaurant.open_time,
+        'close-time': bk.restaurant.close_time
+    }
+    return render(request, 'booking/edit_reservations.html', context)
+
+@login_required()
 def edit_Reservation(request, id):
     booking = models.Bookings.objects.filter(id=id).first()
-    numOfPeople = request.POST.get('number_of_people')
-    time = request.POST.get('time_start')
-    ifAvailable()
+    numOfPeople = int(request.POST.get('size'))
+    time_start = datetime.strptime(request.POST.get('time'), '%H:%M').time()
+    if ifAvailable(booking.restaurant_id, time_start, numOfPeople):
+        booking.reserve_time_start = time_start
+        booking.reserve_time_end = (datetime.combine(date.min, time_start) + timedelta(hours=3)).time()
+        booking.number_of_people = numOfPeople
+        booking.save()
+        messages.info(request, "Reservation successfully updated!")
+        return redirect('reservations')
+    else:
+        messages.error(request, "The are no free seats at this time, try again!")
+        return redirect('reservations')
 
 
 def ifAvailable(rest_id, time_start, numOfPeople):
