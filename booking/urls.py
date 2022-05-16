@@ -14,4 +14,6 @@ urlpatterns = [
     path('reservations/<int:id>', edit_Res, name='edit_res'),
     path('reservations/<int:id>/edit', edit_Reservation, name='edit_reservation'),
     path('reservations/<int:id>/delete', delete_Reservation, name='delete_res'),
+    path('reservations/<int:id>/order', order, name='add_order'),
+    path('reservations/<int:item_id>/order/<int:booking_id>', addToOrder, name='add_to_order'),
 ]

@@ -1,13 +1,15 @@
+import json
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, DetailView
 from . import models
 from booking.forms import CustomRegisterUserForm, CustomLoginUserForm
-from booking.models import Restaurants, CustomUser, Bookings
+from booking.models import Restaurants, CustomUser, Bookings, Items, Orders, OrderItem
 import datetime
 from datetime import datetime, date, timedelta
 
@@ -209,3 +211,66 @@ def ifAvailable(rest_id, time_start, numOfPeople):
     else:
         return False
 
+
+@login_required()
+def order(request, id):
+    booking = models.Bookings.objects.filter(id=id).first()  # restaurant
+    rt = booking.restaurant
+    menu = models.Menu.objects.filter(restaurant_id=rt.id).first()
+    items = models.Items.objects.filter(menu_id=menu.id).all()
+    context = {
+        'rest_name': rt.name,
+        'rest_id': rt.id,
+        'restaurant': rt,
+        'available': rt.total_seats - rt.busy_seats,
+        'pic': rt.photos,
+        'open-time': rt.open_time,
+        'close-time': rt.close_time,
+        'menu': items,
+        'booking_id': booking.id
+    }
+    return render(request, 'booking/add_order.html', context)
+
+
+def addToOrder(request, item_id, booking_id):
+    customer = request.user
+    bk = models.Bookings.objects.filter(id=booking_id).first()
+    item = Items.objects.get(id=item_id)
+    amount = int(request.POST.get('amount'))
+    order, created = Orders.objects.get_or_create(booking=bk, customer=customer)
+    print(created)
+    orderItem, created = OrderItem.objects.get_or_create(order=order, product=item, quantity=amount)
+    print(created)
+    orderItem.save()
+
+    if orderItem.quantity <= 0:
+        orderItem.delete()
+
+    return redirect('add_order', booking_id)
+
+# def updateItem(request):
+#     data = json.loads(request.body)
+#     productId = data['productId']
+#     action = data['action']
+#     bookingId = data['bookingId']
+#     print('Action:', action)
+#     print('Product:', productId)
+#
+#     customer = request.user
+#     product = Items.objects.get(id=productId)
+#
+#     order, created = Orders.objects.get_or_create(booking=bookingId, customer=customer, date_ordered=datetime.now(), complete=False)
+#
+#     orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
+#
+#     if action == 'add':
+#         orderItem.quantity = (orderItem.quantity + 1)
+#     elif action == 'remove':
+#         orderItem.quantity = (orderItem.quantity - 1)
+#
+#     orderItem.save()
+#
+#     if orderItem.quantity <= 0:
+#         orderItem.delete()
+#
+#     return JsonResponse('Item was added', safe=False)

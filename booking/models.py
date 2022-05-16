@@ -86,8 +86,22 @@ class Bookings(models.Model):
 
 class Orders(models.Model):
     booking = models.ForeignKey('Bookings', models.CASCADE)
-    items = models.ManyToManyField('Items')
+    customer = models.ForeignKey('CustomUser', models.CASCADE, default=None)
+    date_ordered = models.DateTimeField(auto_now_add=True)
+    complete = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = 'Order'
         verbose_name_plural = 'Orders'
+
+
+class OrderItem(models.Model):
+    product = models.ForeignKey(Items, on_delete=models.SET_NULL, null=True)
+    order = models.ForeignKey(Orders, on_delete=models.SET_NULL, null=True)
+    quantity = models.IntegerField(default=0, null=True, blank=True)
+    date_added = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def get_total(self):
+        total = self.product.item_cost * self.quantity
+        return total

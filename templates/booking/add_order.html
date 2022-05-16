@@ -1,0 +1,43 @@
+{% extends "booking/base.html" %}
+{% block content %}
+{#    {% if myorders %}#}
+{#        <div class="w3-content" style="max-width:1532px;">#}
+{#            <div class="w3-container w3-margin-top container" id="rooms">#}
+{#                <h3>"{{rest_name}}" Menu</h3>#}
+{#                {% for item in menu %}#}
+{#                    <h4>{{ item.name }} - {{ item.price }} - {{ item.description }} quantity - </h4>#}
+{#                    <form method="POST" action="{% url 'add_to_order' item.id booking_id%}">#}
+{#                        <div class="w3-row-padding" style="margin:8px -8px;">#}
+{#                            <div>#}
+{#                                <label><i class="fa fa-user w3-text-blue"></i> Amount</label>#}
+{#                                <input class="w3-input w3-border" type="number" value="0" name="amount" min="0" required>#}
+{#                            </div>#}
+{#					    </div>#}
+{#                        <button style="color:white">Add</button>#}
+{#                    </form>#}
+{#                {% endfor %}#}
+{#            </div>#}
+{#        </div>#}
+{#    {% endif %}#}
+
+    {% if menu %}
+        <div class="w3-content" style="max-width:1532px;">
+            <div class="w3-container w3-margin-top container" id="rooms">
+                <h3>"{{rest_name}}" Menu</h3>
+                {% for item in menu %}
+                    <h4>{{ item.name }} - {{ item.price }} - {{ item.description }} quantity - </h4>
+                    <form method="POST" action="{% url 'add_to_order' item.id booking_id%}">
+                        {% csrf_token %}
+                        <div class="w3-row-padding" style="margin:8px -8px;">
+                            <div>
+                                <label><i class="fa fa-user w3-text-blue"></i> Amount</label>
+                                <input class="w3-input w3-border" type="number" value="0" name="amount" min="0" required>
+                            </div>
+					    </div>
+                        <button style="color:white">Add</button>
+                    </form>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
