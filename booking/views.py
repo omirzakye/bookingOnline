@@ -216,6 +216,8 @@ def ifAvailable(rest_id, time_start, numOfPeople):
 def order(request, id):
     booking = models.Bookings.objects.filter(id=id).first()  # restaurant
     rt = booking.restaurant
+    ordr = models.Orders.objects.filter(booking_id=booking.id).first()
+    ordrItems = models.OrderItem.objects.filter(order=ordr)
     menu = models.Menu.objects.filter(restaurant_id=rt.id).first()
     items = models.Items.objects.filter(menu_id=menu.id).all()
     context = {
@@ -227,7 +229,8 @@ def order(request, id):
         'open-time': rt.open_time,
         'close-time': rt.close_time,
         'menu': items,
-        'booking_id': booking.id
+        'booking_id': booking.id,
+        'ordered_items': ordrItems
     }
     return render(request, 'booking/add_order.html', context)
 

@@ -40,4 +40,13 @@
             </div>
         </div>
     {% endif %}
+    {% if ordered_items %}
+        {% for item in ordered_items %}{
+            <h4>Id - {{ item.id }}</h4>
+            <h4>Quantity - {{ item.quantity }}</h4>
+            <h4>Product name - {{ item.product }}</h4>
+            <h4>Date added - {{ item.date_added }}</h4>
+            <hr><hr>
+        {% endfor %}
+    {% endif %}
 {% endblock %}

@@ -1,0 +1,45 @@
+{% extends "account/base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}{% trans "Signup" %}{% endblock %}
+
+{% block content %}
+    <section class="ftco-section">
+		<div class="container">
+			<div class="row justify-content-center">
+				<div class="col-md-6 text-center mb-5">
+
+				</div>
+			</div>
+			<div class="row justify-content-center">
+				<div class="col-md-7 col-lg-5">
+					<div class="wrap">
+						<div class="login-wrap p-4 p-md-5">
+			      	<div class="d-flex">
+			      		<div class="w-100">
+			      			<h1 class="mb-4">Sign Up</h1>
+			      		</div>
+
+			      	</div>
+							<form method="POST" action="{% url 'account_signup' %}" class="signin-form">
+			      		<div class="form-group mt-4">
+			      			  {% csrf_token %}
+                              {{ form.as_p }}
+                              {% if redirect_field_value %}
+                              <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                              {% endif %}
+			      		</div>
+		            <div class="form-group">
+		            	<button type="submit" class="form-control btn btn-primary rounded submit px-3">Sign Up</button>
+		            </div>
+		          </form>
+		          <p class="text-center">{% blocktrans %}Already have an account? Then please <a data-toggle="tab" href="{{ login_url }}">Sign In</a>.{% endblocktrans %}</p>
+		        </div>
+		      </div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+{% endblock %}
