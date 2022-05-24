@@ -1,0 +1,56 @@
+{% extends "booking/base.html" %}
+{% load static %}
+{% block content %}
+    <!-- client section -->
+    <br>
+  <section class="client_section layout_padding-bottom">
+    <div class="container">
+      <div class="heading_container heading_center psudo_white_primary mb_45">
+        <h2>
+          What Says Our Customers
+        </h2>
+      </div>
+      <div class="carousel-wrap row ">
+        <div class="owl-carousel client_owl-carousel">
+          <div class="item">
+            <div class="box">
+              <div class="detail-box">
+                <p>
+                  Customer comments
+                </p>
+                <h6>
+                  Customer one
+                </h6>
+                <p>
+                  customer1@gmail.com
+                </p>
+              </div>
+              <div class="img-box">
+                <img src="{% static 'images/client1.jpg' %}" alt="client image" class="box-img">
+              </div>
+            </div>
+          </div>
+          <div class="item">
+            <div class="box">
+              <div class="detail-box">
+                <p>
+                  Customer comments</p>
+                <h6>
+                  Customer two
+                </h6>
+                <p>
+                  customer2@gmail.com
+                </p>
+              </div>
+              <div class="img-box">
+                <img src="{% static 'images/client2.jpg' %}" alt="client image" class="box-img">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- end client section -->
+    </div>
+{% endblock %}

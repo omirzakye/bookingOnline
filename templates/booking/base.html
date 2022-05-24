@@ -1,13 +1,36 @@
-{%load static%}
 <!DOCTYPE html>
+{% load static %}
+
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-		<title>Booking online</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="{% static 'css/style.css' %}">
-        <link rel="stylesheet" href="{% static 'fonts/material-design-iconic-font/css/material-design-iconic-font.min.css' %}">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <meta charset="utf-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+      <!-- Mobile Metas -->
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+      <!-- Site Metas -->
+      <meta name="keywords" content="" />
+      <meta name="description" content="" />
+      <meta name="author" content="" />
+      <link rel="shortcut icon" href="{% static 'images/favicon.png' %}" type="">
+
+      <title> Reservation </title>
+
+      <!-- bootstrap core css -->
+      <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}" />
+
+      <!--owl slider stylesheet -->
+      <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
+      <!-- nice select  -->
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/css/nice-select.min.css" integrity="sha512-CruCP+TD3yXzlvvijET8wV5WxxEh5H8P4cmz0RFbKK6FlZ2sYl3AEsKlLPHbniXKSrDdFewhbmBK5skbdsASbQ==" crossorigin="anonymous" />
+      <!-- font awesome style -->
+      <link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet" />
+
+      <!-- Custom styles for this template -->
+      <link href="{% static 'css/style.css' %}" rel="stylesheet" />
+      <!-- responsive style -->
+      <link href="{% static 'css/responsive.css' %}" rel="stylesheet" />
+
+
 </head>
 <script>
         function getToken(name) {
@@ -29,74 +52,134 @@
         var csrftoken = getToken('csrftoken')
         console.log('CSRFTOKEN:', csrftoken)
 </script>
+
 <body>
-    <div class="navbar navbar-inverse">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-lg-12">
+<div class="hero_area" >
+    <!-- header section strats -->
+    <header class="header_section" style="background: #1b1e21;">
+      <div class="container">
+        <nav class="navbar navbar-expand-lg custom_nav-container ">
+          <a class="navbar-brand" href="{% url 'home' %}">
+            <span>
+              RESTO
+            </span>
+          </a>
 
-                    <div class="navbar-header">
-                        <button class="navbar-toggle" data-target="#mobile_menu" data-toggle="collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button>
-                        <a href="#" class="navbar-brand" style="color: orange">Table reservation</a>
-                    </div>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class=""> </span>
+          </button>
 
-                    <div class="navbar-collapse collapse" id="mobile_menu">
-                        <ul class="nav navbar-nav">
-                            <li ><a href="{% url 'home' %}" style="font-weight: bold">Home</a></li>
-{#                            <li><a href="#" class="dropdown-toggle" data-toggle="dropdown">1 <span class="caret" style="color: orange"></span></a>#}
-{#                                <ul class="dropdown-menu">#}
-{#                                    <li><a href="#">1</a></li>#}
-{#                                    <li><a href="#">2</a></li>#}
-{#                                    <li><a href="#">3</a></li>#}
-{#                                    <li><a href="#">4</a></li>#}
-{#                                    <li><a href="#">5</a></li>#}
-{#                                    <li><a href="#">6</a></li>#}
-{#                                </ul>#}
-{#                            </li>#}
-                            <li><a href="{% url 'reservations' %}">My Reservations</a></li>
-{#                            <li><a href="#">3   </a></li>#}
-                        </ul>
-                        <ul class="nav navbar-nav">
-                            <li>
-                                {# SEARCH bar #}
-                                <form action="{% url 'search_rest_by_name' %}" class="navbar-form" method="post">
-                                    {% csrf_token %}
-                                    <div class="form-group">
-                                        <div class="input-group">
-                                            <input type="search" name="search_field" id="" placeholder="Search Anything Here..." class="form-control">
-                                            <span class="input-group-addon"><span class="glyphicon glyphicon-search" style="color: orange"></span></span>
-                                        </div>
-                                    </div>
-                                </form>
-                                {#  #}
-                            </li>
-                        </ul>
-                         {%block login%}
-                            {% if user.is_authenticated%}
-                            <ul class="nav navbar-nav navbar-right">
-                                <li>
-                                  <a href="{% url 'account_logout' %}">Log out</a>
-                                </li>
-                            </ul>
-                            <ul class="nav navbar-nav navbar-right">
-                                <li><h4 style="padding-top: 9%; color: white">{{ user.first_name }}</h4></li>
-                                <li><h4 style="padding-top: 9%; color: white">{{ user.last_name }}</h4></li>
-                            </ul>
-                            {%else%}
-                            <ul class="nav navbar-nav navbar-right">
-                                        <li><a href="{% url 'account_login' %}">Log in</a></li>
-                                        <li><a href="{% url 'account_signup' %}">Register Now</a></li>
-                                    </ul>
-                            {%endif%}
-                        {% endblock %}
-                    </div>
-                </div>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav  mx-auto ">
+              <li class="nav-item active">
+                <a class="nav-link" href="{% url 'home' %}">Home <span class="sr-only">(current)</span></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'reservations' %}">My reservations</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'about_us' %}">Contact us</a>
+              </li>
+            </ul>
+            <form class="form-inline" action="{% url 'search_rest_by_name' %}" method="post">
+                {% csrf_token %}
+                <input type="search" name="search_field" class="fa fa-search" placeholder="Search ...">
+            </form>
+            <div class="user_option">
+              <a href="#MYPROFIIIIILE" class="user_link">
+                <i class="fa fa-user" aria-hidden="true"></i>
+              </a>
+                {%block login%}
+                    {% if user.is_authenticated%}
+                        <p style="padding-top: 5%; color: white">{{ user }}</p>
+                        <a href="{% url 'account_logout' %}" class="order_online">Log out</a>
+                    {%else%}
+                        <a href="{% url 'account_login' %}">Log in</a>
+                        <a href="{% url 'account_signup' %}">Register Now</a>
+                    {%endif%}
+                {% endblock %}
+
             </div>
-        </div>
-    </div>
+          </div>
+        </nav>
+      </div>
+    </header>
+    <!-- end header section -->
     {% block content %}
 
     {% endblock %}
+<!-- footer section -->
+  <footer class="footer_section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6 footer-col">
+          <div class="footer_contact">
+            <h4>
+              Contact Us
+            </h4>
+            <div class="contact_link_box">
+              <a href="https://go.2gis.com/wqxuz">
+                <i class="fa fa-map-marker" aria-hidden="true"></i>
+                <span>
+                  Location
+                </span>
+              </a>
+              <a href="">
+                <i class="fa fa-phone" aria-hidden="true"></i>
+                <span>
+                  Call +7 776 1780855
+                </span>
+              </a>
+              <a href="">
+                <i class="fa fa-envelope" aria-hidden="true"></i>
+                <span>
+                  omirzak.ye@gmail.com
+                </span>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 footer-col">
+          <div class="footer_detail">
+            <a href="" class="footer-logo">
+              Resto
+            </a>
+            <p>
+                Owners:<br>
+                Batyrzhan Kudaibergenov<br>
+                Yerkanat Omirzak
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="footer-info">
+        <p>
+          &copy; <span id="displayYear"></span> All Rights Reserved By Yerkanat Omirzak
+        </p>
+      </div>
+    </div>
+  </footer>
+  <!-- footer section -->
 </body>
-<script type="text/javascript" src="{% static 'js/booking.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/reservation.js' %}"></script>
+    <!-- jQery -->
+      <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+      <!-- popper js -->
+      <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous">
+      </script>
+      <!-- bootstrap js -->
+      <script src="{% static 'js/bootstrap.js' %}"></script>
+      <!-- owl slider -->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js">
+      </script>
+      <!-- isotope js -->
+      <script src="https://unpkg.com/isotope-layout@3.0.4/dist/isotope.pkgd.min.js"></script>
+      <!-- nice select -->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/js/jquery.nice-select.min.js"></script>
+      <!-- custom js -->
+      <script src="{% static 'js/custom.js' %}"></script>
+      <!-- Google Map -->
+      <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCh39n5U-4IoWpsVGUHWdqB6puEkhRLdmI&callback=myMap">
+      </script>
+      <!-- End Google Map -->
 </html>

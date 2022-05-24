@@ -1,52 +1,93 @@
 {% extends "booking/base.html" %}
 {% block content %}
-{#    {% if myorders %}#}
-{#        <div class="w3-content" style="max-width:1532px;">#}
-{#            <div class="w3-container w3-margin-top container" id="rooms">#}
-{#                <h3>"{{rest_name}}" Menu</h3>#}
-{#                {% for item in menu %}#}
-{#                    <h4>{{ item.name }} - {{ item.price }} - {{ item.description }} quantity - </h4>#}
-{#                    <form method="POST" action="{% url 'add_to_order' item.id booking_id%}">#}
-{#                        <div class="w3-row-padding" style="margin:8px -8px;">#}
-{#                            <div>#}
-{#                                <label><i class="fa fa-user w3-text-blue"></i> Amount</label>#}
-{#                                <input class="w3-input w3-border" type="number" value="0" name="amount" min="0" required>#}
-{#                            </div>#}
-{#					    </div>#}
-{#                        <button style="color:white">Add</button>#}
-{#                    </form>#}
-{#                {% endfor %}#}
-{#            </div>#}
-{#        </div>#}
-{#    {% endif %}#}
-
+<style>
+    .my-table th, td {
+      border-bottom: 1px solid #ddd;
+      border-right: 1px solid #ddd;
+      text-align: center;
+      padding: 7px;
+    }
+</style>
+      <!-- food section -->
     {% if menu %}
-        <div class="w3-content" style="max-width:1532px;">
-            <div class="w3-container w3-margin-top container" id="rooms">
-                <h3>"{{rest_name}}" Menu</h3>
-                {% for item in menu %}
-                    <h4>{{ item.name }} - {{ item.price }} - {{ item.description }} quantity - </h4>
-                    <form method="POST" action="{% url 'add_to_order' item.id booking_id%}">
-                        {% csrf_token %}
-                        <div class="w3-row-padding" style="margin:8px -8px;">
-                            <div>
-                                <label><i class="fa fa-user w3-text-blue"></i> Amount</label>
-                                <input class="w3-input w3-border" type="number" value="0" name="amount" min="0" required>
-                            </div>
-					    </div>
-                        <button style="color:white">Add</button>
-                    </form>
-                {% endfor %}
-            </div>
-        </div>
-    {% endif %}
-    {% if ordered_items %}
-        {% for item in ordered_items %}{
-            <h4>Id - {{ item.id }}</h4>
-            <h4>Quantity - {{ item.quantity }}</h4>
-            <h4>Product name - {{ item.product }}</h4>
-            <h4>Date added - {{ item.date_added }}</h4>
-            <hr><hr>
+  <section class="food_section layout_padding-bottom">
+    <div class="container">
+      <div class="heading_container heading_center">
+        <h2>
+          Our Menu
+        </h2>
+      </div>
+
+{#      <ul class="filters_menu">#}
+{#        <li class="active" data-filter="*">All</li>#}
+{#        <li data-filter=".burger">Burger</li>#}
+{#        <li data-filter=".pizza">Pizza</li>#}
+{#        <li data-filter=".pasta">Pasta</li>#}
+{#        <li data-filter=".fries">Fries</li>#}
+{#      </ul>#}
+
+  {% if ordered_items %}
+      <h2>Your orders</h2>
+      <table class="my-table">
+          <tr>
+            <th>Name</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Total cost</th>
+          </tr>
+        {% for item in ordered_items %}
+            <tr>
+                <td>{{ item.product }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.product.price }}₸</td>
+                <td>{{ item.get_total }}₸</td>
+                <td><button style="border-radius: 5px" onclick=addToOrder('{{ item.product_id }}','{{ booking_id }}','add')>Add</button></td>
+                <td><button style="border-radius: 5px" onclick=addToOrder('{{ item.product_id }}','{{ booking_id }}','remove')>Remove</button></td>
+            </tr>
         {% endfor %}
+        <a style="float:right; margin:5px;" class="btn btn-success" href="{% url 'checkout' booking_id%}">Checkout</a>
+      </table>
+  {% endif %}
+
+      <div class="filters-content">
+        <div class="row grid">
+            {% for m in menu %}
+                <h4></h4>
+          <div class="col-sm-6 col-lg-4 all">
+            <div class="box">
+              <div>
+                <div class="img-box">
+                  <img src="{{ m.photo }}" alt="Photo of the food">
+                </div>
+                <div class="detail-box">
+                  <h5>
+                    {{ m.name }}
+                  </h5>
+                  <p>
+                    {{ m.description }}
+                  </p>
+                  <div class="options">
+                    <h6>
+                      {{ m.price }} T
+                    </h6>
+                      <a style="cursor: pointer" onclick=addToOrder('{{ m.id }}','{{ booking_id }}','add')>Add</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+            {% endfor %}
+        </div>
+      </div>
+{#      <div class="btn-box">#}
+{#        <a href="">#}
+{#          View More#}
+{#        </a>#}
+{#      </div>#}
+    </div>
+  </section>
+
     {% endif %}
+{#   End food section #}
+
 {% endblock %}

@@ -1,25 +1,77 @@
 {% extends "booking/base.html" %}
+{% load static %}
 {% block content %}
-<h2><br>All restaurants are:</h2>
-    {% if all_restaurants %}
-    <div class="row" style="padding-left: 4%; padding-right: 4%">
-        {% for rest in all_restaurants %}
-        <div class="col-lg-3" style="margin-top: 1%">
-            <img class="thumbnail" src="{{rest.photos}}">
-            <div class="box-element product">
-                <h3><strong><a href="#">{{rest.name}}</a></strong></h3>
-                <hr>
-                <h4 style="display: inline-block;"><strong>Number of seats: {{rest.total_seats}}</strong></h4>
-                <h4 style="display: inline-block;"><strong><a href="{{rest.address}}">Address</a> </strong></h4>
-                <h4 style="display: inline-block;"><strong>Open-time: {{rest.open_time}}</strong></h4>
-                <h4 style="display: inline-block;"><strong>Close-time: {{rest.close_time}}</strong></h4>
-                <h4 style="display: inline-block;"><strong><a href="{{rest.address}}">Instagram</a></strong></h4>
-                <h6><strong><a href="{% url 'restaurant' rest.id %}">Reserve</a></strong></h6>
-            </div>
-        </div>
-        {% endfor %}
+
+    <!-- slider section -->
+    <section class="slider_section ">
+        <div class="bg-box">
+      <img src="{% static 'images/hero-bg.jpg' %}" alt="">
     </div>
+        <div id="customCarousel1" class="carousel slide" data-ride="carousel">
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <div class="container ">
+              <div class="row">
+                <div class="col-md-7 col-lg-6 ">
+                  <div class="detail-box">
+                    <h1>
+                      Reserve a Table
+                    </h1>
+                    <p>
+                        Fast and convenient online table reservation
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="container">
+          <ol class="carousel-indicators">
+            <li data-target="#customCarousel1" data-slide-to="0" class="active"></li>
+            <li data-target="#customCarousel1" data-slide-to="1"></li>
+            <li data-target="#customCarousel1" data-slide-to="2"></li>
+          </ol>
+        </div>
+      </div>
+
+    </section>
+    <!-- end slider section -->
+</div>
+  <!-- offer section -->
+{% if all_restaurants %}
+  <section class="offer_section layout_padding-bottom">
+    <div class="offer_container">
+      <div class="container ">
+      <h1><br>All restaurants are:</h1>
+        <div class="row">
+            {% for rest in all_restaurants %}
+          <div class="col-md-6  ">
+            <div class="box ">
+              <div class="img-box">
+                <img src="{{ rest.photos }}" alt="">
+              </div>
+              <div class="detail-box">
+                <h3>
+                  {{rest.name}}
+                </h3>
+                <h5>Number of seats: {{rest.total_seats}} </h5>
+                <h5>Address: <a href="{{rest.address}}">2GIS</a> </h5>
+                <h5>Open-time: {{rest.open_time}} </h5>
+                <h5>Close-time: {{rest.close_time}} </h5>
+                <h8> <a href="{{rest.instagram}}">Instagram</a> </h8>
+                <a href="{% url 'restaurant' rest.id %}">Reserve</a>
+              </div>
+            </div>
+          </div>
+            {% endfor %}
+        </div>
+      </div>
+    </div>
+  </section>
     {% else %}
         <h2>NO items yet!</h2>
     {% endif %}
+
 {% endblock %}

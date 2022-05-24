@@ -3,10 +3,14 @@ from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
+from django.core.mail import send_mail
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import CreateView, ListView, DetailView
+
+from BookingRest import settings
 from . import models
 from booking.forms import CustomRegisterUserForm, CustomLoginUserForm
 from booking.models import Restaurants, CustomUser, Bookings, Items, Orders, OrderItem
@@ -17,12 +21,16 @@ from datetime import datetime, date, timedelta
 class IndexView(ListView):
     template_name = "booking/index.html"
     context_object_name = "all_restaurants"
-    queryset = Restaurants.objects.all();
+    queryset = Restaurants.objects.all()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # context['popular_items'] = Item.objects.filter(num_of_views__gt=0).order_by('-num_of_views')[:4]
         return context
+
+
+def home2(request):
+    return render(request, 'booking/home.html')
 
 
 # JavaSCript optimize
@@ -61,9 +69,9 @@ def restaurant(request, rest_id):
 @login_required
 def reserve(request, idd):
     rt = models.Restaurants.objects.filter(id=idd).first()  # restaurant
-    rdate = request.GET.get('date')
-    size = int(request.GET.get('size'))
-    rtime = datetime.strptime(request.GET.get('time'), '%H:%M').time()
+    rdate = request.POST.get('date')
+    size = int(request.POST.get('size'))
+    rtime = datetime.strptime(request.POST.get('time'), '%H:%M').time()
     context = {
         'name': rt.name,
         'idd': rt.id,
@@ -76,74 +84,46 @@ def reserve(request, idd):
         'time': rtime
     }
 
-    if request.method == 'POST':
-        firstname = request.POST.get('firstname')
-        surname = request.POST.get('surname')
-        phone = request.POST.get('phone')
-        email = request.POST.get('email')
-        specialRequest = request.POST.get('specialRequest')
-        context.update({
-            'firstname': firstname,
-            'surname': surname,
-            'phone': phone,
-            'email': email,
-            'specialRequest': specialRequest,
-        })
-        endTime = (datetime.combine(date.min, rtime) + timedelta(hours=3)).time()
-        reservation = models.Bookings(number_of_people=size, reserve_date=rdate, status=True, restaurant_id=rt.id,
-                                      user_id=request.user.id,
-                                      reserve_time_end=endTime,
-                                      reserve_time_start=rtime,
-                                      reserverFname=firstname,
-                                      reserverLname=surname,
-                                      email=email,
-                                      phone=phone,
-                                      specialRequest=specialRequest)
-        reservation.save()
-        rt.busy_seats += size
-        rt.save()
-        messages.success(request, 'You have successfully reserved a table. Please be on time!')
-        return redirect('reservations')
-
     if not ifAvailable(rt.id, rtime, size):
         context.update({
             'decline': "No available seats for this hour!"
         })
         return render(request, 'booking/restaurant.html', context)
     else:
-        return render(request, 'booking/reserve.html', context)
-
-
-class RegisterView(CreateView):
-    form_class = CustomRegisterUserForm
-    template_name = 'registrations/registration.html'
-    success_url = reverse_lazy('home')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = 'Register'
-        return context
-
-    def form_valid(self, form):
-        user = form.save()
-        login(self.request, user)
-        return redirect('home')
-
-
-class LoginUserView(LoginView):
-    form_class = CustomLoginUserForm
-    template_name = 'registrations/login.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = 'Log in'
-        return context
-
-
-@login_required
-def logout_user(request):
-    logout(request)
-    return redirect('login')
+        if request.method == 'POST':
+            firstname = request.POST.get('firstname')
+            surname = request.POST.get('surname')
+            phone = request.POST.get('phone')
+            email = request.POST.get('email')
+            specialRequest = request.POST.get('specialRequest')
+            context.update({
+                'firstname': firstname,
+                'surname': surname,
+                'phone': phone,
+                'email': email,
+                'specialRequest': specialRequest,
+            })
+            endTime = (datetime.combine(date.min, rtime) + timedelta(hours=3)).time()
+            reservation = models.Bookings(number_of_people=size, reserve_date=rdate, status=True, restaurant_id=rt.id,
+                                          user_id=request.user.id,
+                                          reserve_time_end=endTime,
+                                          reserve_time_start=rtime,
+                                          reserverFname=firstname,
+                                          reserverLname=surname,
+                                          email=email,
+                                          phone=phone,
+                                          specialRequest=specialRequest)
+            reservation.save()
+            rt.busy_seats += size
+            rt.save()
+            messages.success(request, 'You have successfully reserved a table. Please be on time!')
+            # messaging to gmail section
+            subject = 'Table Reservation'
+            msg = 'You have successfully reserved a table at ' + rt.name + ' for ' + str(size) + ' people at ' + str(rtime) + '. Please be on time!'
+            recipient = email
+            send_mail(subject,
+                      msg, settings.EMAIL_HOST_USER, [recipient], fail_silently=False)
+            return redirect('reservations')
 
 
 @login_required
@@ -167,15 +147,25 @@ def delete_Reservation(request, id):
 @login_required()
 def edit_Res(request, id):
     bk = models.Bookings.objects.filter(id=id).first()  # restaurant
+    menu = models.Menu.objects.filter(restaurant_id=bk.restaurant_id).first()
+    items = models.Items.objects.filter(menu_id=menu.id).all().order_by('type')
     context = {
         'name': bk.restaurant.name,
         'id': bk.id,
         'restaurant': bk.restaurant,
         'available': bk.restaurant.total_seats - bk.restaurant.busy_seats,
         'open-time': bk.restaurant.open_time,
-        'close-time': bk.restaurant.close_time
+        'close-time': bk.restaurant.close_time,
+        'menu': items
     }
+    # messaging to gmail section
+    subject = 'Table Reservation'
+    msg = 'You have successfully reserved a table at ' + bk.restaurant.name + ' for ' + str(bk.number_of_people) + ' people at ' + str(bk.reserve_time_start) + '. Please be on time!'
+    recipient = bk.email
+    send_mail(subject,
+              msg, settings.EMAIL_HOST_USER, [recipient], fail_silently=False)
     return render(request, 'booking/edit_reservations.html', context)
+
 
 @login_required()
 def edit_Reservation(request, id):
@@ -216,10 +206,10 @@ def ifAvailable(rest_id, time_start, numOfPeople):
 def order(request, id):
     booking = models.Bookings.objects.filter(id=id).first()  # restaurant
     rt = booking.restaurant
-    ordr = models.Orders.objects.filter(booking_id=booking.id).first()
-    ordrItems = models.OrderItem.objects.filter(order=ordr)
+    ordr = models.Orders.objects.filter(booking_id=booking.id, complete=False).first()
+    ordrItems = models.OrderItem.objects.filter(order=ordr).order_by('product_id')
     menu = models.Menu.objects.filter(restaurant_id=rt.id).first()
-    items = models.Items.objects.filter(menu_id=menu.id).all()
+    items = models.Items.objects.filter(menu_id=menu.id).all().order_by('type')
     context = {
         'rest_name': rt.name,
         'rest_id': rt.id,
@@ -235,45 +225,60 @@ def order(request, id):
     return render(request, 'booking/add_order.html', context)
 
 
-def addToOrder(request, item_id, booking_id):
+@login_required()
+def addToOrder(request):
+    data = json.loads(request.body)
+    productId = data['productId']
+    action = data['action']
+    bookingId = data['bookingId']
+    print('Action:', action)
+    print('Product:', productId)
     customer = request.user
-    bk = models.Bookings.objects.filter(id=booking_id).first()
-    item = Items.objects.get(id=item_id)
-    amount = int(request.POST.get('amount'))
-    order, created = Orders.objects.get_or_create(booking=bk, customer=customer)
-    print(created)
-    orderItem, created = OrderItem.objects.get_or_create(order=order, product=item, quantity=amount)
-    print(created)
+    product = Items.objects.get(id=productId)
+    print('Product:', product.id, ' ', product.name)
+    bk = models.Bookings.objects.filter(id=bookingId).first()
+
+    order, created = Orders.objects.get_or_create(booking=bk, customer=customer, complete=False)
+    orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
+
+    if action == 'add':
+        orderItem.quantity = (orderItem.quantity + 1)
+    elif action == 'remove':
+        orderItem.quantity = (orderItem.quantity - 1)
+
     orderItem.save()
 
     if orderItem.quantity <= 0:
         orderItem.delete()
 
-    return redirect('add_order', booking_id)
+    return JsonResponse('Item was added', safe=False)
 
-# def updateItem(request):
-#     data = json.loads(request.body)
-#     productId = data['productId']
-#     action = data['action']
-#     bookingId = data['bookingId']
-#     print('Action:', action)
-#     print('Product:', productId)
-#
-#     customer = request.user
-#     product = Items.objects.get(id=productId)
-#
-#     order, created = Orders.objects.get_or_create(booking=bookingId, customer=customer, date_ordered=datetime.now(), complete=False)
-#
-#     orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
-#
-#     if action == 'add':
-#         orderItem.quantity = (orderItem.quantity + 1)
-#     elif action == 'remove':
-#         orderItem.quantity = (orderItem.quantity - 1)
-#
-#     orderItem.save()
-#
-#     if orderItem.quantity <= 0:
-#         orderItem.delete()
-#
-#     return JsonResponse('Item was added', safe=False)
+
+def checkOut(request, booking_id):
+    if request.user.is_authenticated:
+        bk = models.Bookings.objects.filter(id=booking_id).first()
+        customer = request.user
+        order, created = Orders.objects.get_or_create(booking=bk, customer=customer, complete=False)
+        items = order.orderitem_set.all()
+    else:
+        items = []
+        order = {'get_order_total': 0, 'get_order_items': 0}
+
+    context = {'items': items, 'order': order, 'booking': bk}
+    return render(request, 'booking/checkout.html', context)
+
+
+@csrf_exempt
+def processOrder(request):
+    if request.user.is_authenticated:
+        customer = request.user
+        order, created = Orders.objects.get_or_create(customer=customer, complete=False)
+
+        order.complete = True
+        order.save()
+
+    return JsonResponse('Payment completed', safe=False)
+
+
+def aboutUs(request):
+    return render(request, 'booking/aboutus.html')

@@ -1,68 +1,125 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-		<title>Booking online</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+{% extends "booking/base.html" %}
+{% load static %}
+{% block content %}
 
-        <!-- Bootstrap CSS -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-</head>
-<body>
-<div class="w3-bar w3-white w3-large">
-		<a href="{% url 'home' %}" class="w3-bar-item w3-button w3-blue w3-mobile"><i class="fa fa-cutlery w3-margin-right"></i>REST</a>
-{#		<a href="{% url 'home' %}" class="w3-bar-item w3-button w3-mobile">Home</a>#}
-{#		<a href="{% url 'home' %}" class="w3-bar-item w3-button w3-mobile">About</a>#}
-{#		<a href="{% url 'home' %}" class="w3-bar-item w3-button w3-mobile">Contact</a>#}
-{#		<a href="{% url 'home' %}" class="w3-bar-item w3-button w3-right w3-light-grey w3-mobile">Book Now</a>#}
-	</div>
-    <header class="w3-display-container w3-content" style="max-width:1500px;">
-		<img class="w3-image" src="{{ pic }}" alt="The Hotel" style="min-width:1000px" width="1500" height="800">
-		<div class="w3-display-left w3-padding w3-col l6 m8">
-			<div class="w3-container w3-blue">
-				<h2><i class="fa fa-cutlery w3-margin-right"></i>Make a reservation</h2>
-			</div>
-			<div class="w3-container w3-white w3-padding-16">
-				<form action="{% url 'table-reserve' idd %}" method="get">
-					<div class="w3-row-padding" style="margin:0 -16px;">
-                        {% if decline %}
-                        <h2>{{decline}}</h2>
-                        <h2>Available number of seats for this hour{{available}}</h2>
-						{% endif %}
-                        <div class="w3-half w3-margin-bottom">
-							<label><i class="fa fa-calendar w3-text-blue"></i> Date</label>
-							<input class="w3-input w3-border" type="date" placeholder="" id="date-r" name="date" required>
-						</div>
-						<div class="w3-half">
-							<label><i class="fa fa-clock-o w3-text-blue"></i> Time</label>
-							<input class="w3-input w3-border" type="time" placeholder="" id="time-r" name="time" required>
-						</div>
-					</div>
-					<div class="w3-row-padding" style="margin:8px -8px;">
-						<div>
-							<label><i class="fa fa-user w3-text-blue"></i> Party size</label>
-							<input class="w3-input w3-border" type="number" value="0" name="size" min="0" max="60" required>
-						</div>
-					</div>
-					<button class="w3-button w3-dark-grey mt-2" type="submit"><i class="fa fa-search w3-margin-right"></i> Reserve</button>
-				</form>
-			</div>
-		</div>
-	</header>
+<!-- book section -->
+  <section class="book_section layout_padding">
+    <div class="container">
+      <div class="heading_container">
+        <h2><i class="fa fa-cutlery w3-margin-right"></i>
+          Book A Table
+        </h2>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form_container">
+            <form action="{% url 'table-reserve' idd %}" method="POST">
+                {% csrf_token %}
+                {% if decline %}
+                    <h2>{{decline}}</h2>
+                    <h2>Available number of seats for this hour{{available}}</h2>
+                {% endif %}
+              <div>
+                <input type="text" class="form-control" placeholder="Your Name" name="firstname"/>
+              </div>
+                <div>
+                    <input type="text" class="form-control" placeholder="Your Last name" name="surname"/>
+                </div>
+              <div>
+                <input type="text" class="form-control" placeholder="Phone Number" name="phone"/>
+              </div>
+              <div>
+                <input type="email" class="form-control" placeholder="Your Email" name="email"/>
+              </div>
+              <div>
+                <input placeholder="Party size" class="form-control" type="number" name="size" min="0" max="60" required>
+              </div>
+              <div>
+                <input type="date" class="form-control" name="date" required>
+              </div>
+                <div>
+                    <input placeholder="Time..." type="time" class="form-control" name="time" required>
+                </div>
+                <div>
+                    <input placeholder="Special Request..." type="text" class="form-control" name="specialRequest" required>
+                </div>
+              <div class="btn_box">
+                <button type="submit">
+                  Book Now
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="map_container ">
+            <div id="googleMap"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+  <!-- end book section -->
 
 	<!-- Page content -->
-	<div class="w3-content" style="max-width:1532px;">
+    <!-- food section -->
 
-		<div class="w3-container w3-margin-top container" id="rooms">
-			<h3>{{name}}</h3>
-			<p>In this page you can see any information related to the "{{name}}" restaurant.</p>
+  <section class="food_section layout_padding-bottom">
+    <div class="container">
+      <div class="heading_container heading_center">
+        <h2>
+          Our Menu
+        </h2>
+      </div>
+
+      <ul class="filters_menu">
+        <li class="active" data-filter="*">All</li>
+        <li data-filter=".burger">Burger</li>
+        <li data-filter=".pizza">Pizza</li>
+        <li data-filter=".pasta">Pasta</li>
+        <li data-filter=".fries">Fries</li>
+      </ul>
+
+      <div class="filters-content">
+        <div class="row grid">
             {% for m in menu %}
-                <h4>{{ m.name }} - {{ m.price }} - {{ m.description }}</h4>
+                <h4></h4>
+          <div class="col-sm-6 col-lg-4 all pizza">
+            <div class="box">
+              <div>
+                <div class="img-box">
+                  <img src="{{ m.photo }}" alt="Photo of the food">
+                </div>
+                <div class="detail-box">
+                  <h5>
+                    {{ m.name }}
+                  </h5>
+                  <p>
+                    {{ m.description }}
+                  </p>
+                  <div class="options">
+                    <h6>
+                      {{ m.price }} ₸
+                    </h6>
+{#                    <a href="">#}
+{##}
+{#                    </a>#}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
             {% endfor %}
         </div>
+      </div>
+{#      <div class="btn-box">#}
+{#        <a href="">#}
+{#          View More#}
+{#        </a>#}
+{#      </div>#}
     </div>
-</body>
-</html>
+  </section>
+{#   End food section #}
+
+{% endblock %}

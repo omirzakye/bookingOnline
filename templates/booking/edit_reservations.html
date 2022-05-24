@@ -1,7 +1,7 @@
 {% extends "booking/base.html" %}
 {% block content %}
     <header class="w3-display-container w3-content" style="max-width:1500px;">
-		<img class="w3-image" src="{{ pic }}" alt="The Hotel" style="min-width:1000px" width="1500" height="800">
+		<img class="w3-image" src="{{ restaurant.photos }}" alt="The Restaurant" style="min-width:1000px" width="1500" height="800">
 		<div class="w3-display-left w3-padding w3-col l6 m8">
 			<div class="w3-container w3-blue">
 				<h2><i class="fa fa-cutlery w3-margin-right"></i>Make a reservation</h2>
@@ -39,7 +39,61 @@
 
 		<div class="w3-container w3-margin-top container" id="rooms">
 			<h3>{{name}}</h3>
-			<p>In this page you can see any information related to the "{{name}}" restaurant.</p>
-		</div>
+			<section class="food_section layout_padding-bottom">
+                <div class="container">
+                  <div class="heading_container heading_center">
+                    <h2>
+                      Our Menu
+                    </h2>
+                  </div>
+
+                  <ul class="filters_menu">
+                    <li class="active" data-filter="*">All</li>
+                    <li data-filter=".burger">Burger</li>
+                    <li data-filter=".pizza">Pizza</li>
+                    <li data-filter=".pasta">Pasta</li>
+                    <li data-filter=".fries">Fries</li>
+                  </ul>
+
+                  <div class="filters-content">
+                    <div class="row grid">
+                        {% for m in menu %}
+                            <h4></h4>
+                      <div class="col-sm-6 col-lg-4 all pizza">
+                        <div class="box">
+                          <div>
+                            <div class="img-box">
+                              <img src="{{ m.photo }}" alt="Photo of the food">
+                            </div>
+                            <div class="detail-box">
+                              <h5>
+                                {{ m.name }}
+                              </h5>
+                              <p>
+                                {{ m.description }}
+                              </p>
+                              <div class="options">
+                                <h6>
+                                  {{ m.price }} ₸
+                                </h6>
+            {#                    <a href="">#}
+            {##}
+            {#                    </a>#}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                        {% endfor %}
+                    </div>
+                  </div>
+            {#      <div class="btn-box">#}
+            {#        <a href="">#}
+            {#          View More#}
+            {#        </a>#}
+            {#      </div>#}
+                </div>
+              </section>
+        </div>
     </div>
 {% endblock %}

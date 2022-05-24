@@ -94,6 +94,21 @@ class Orders(models.Model):
         verbose_name = 'Order'
         verbose_name_plural = 'Orders'
 
+    def __str__(self):
+        return str(self.id)
+
+    @property
+    def get_order_total(self):
+        orderitems = self.orderitem_set.all()
+        total = sum([item.get_total for item in orderitems])
+        return total
+
+    @property
+    def get_order_items(self):
+        orderitems = self.orderitem_set.all()
+        total = sum([item.quantity for item in orderitems])
+        return total
+
 
 class OrderItem(models.Model):
     product = models.ForeignKey(Items, on_delete=models.SET_NULL, null=True)
@@ -103,5 +118,5 @@ class OrderItem(models.Model):
 
     @property
     def get_total(self):
-        total = self.product.item_cost * self.quantity
+        total = self.product.price * self.quantity
         return total
