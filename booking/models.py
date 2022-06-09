@@ -27,6 +27,7 @@ class Items(models.Model):
     price = models.IntegerField()
     type = models.CharField(max_length=50)
     description = models.TextField()
+    image = models.ImageField()
 
     class Meta:
         verbose_name = 'Item'
@@ -45,12 +46,13 @@ class Menu(models.Model):
 
 
 class Restaurants(models.Model):
+    owner = models.ForeignKey('CustomUser', models.CASCADE, default=None)
     name = models.CharField(max_length=50)
     address = models.TextField()
     open_time = models.TimeField()
     close_time = models.TimeField()
     instagram = models.TextField()
-    photos = models.ImageField()
+    photo = models.ImageField()
     total_seats = models.IntegerField()
     busy_seats = models.IntegerField()
 

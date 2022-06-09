@@ -29,10 +29,6 @@ class IndexView(ListView):
         return context
 
 
-def home2(request):
-    return render(request, 'booking/home.html')
-
-
 # JavaSCript optimize
 def search_rest_by_name(request):
     if request.method == "POST" and len(request.POST.get("search_field")) > 0:
@@ -52,13 +48,13 @@ def search_success(request, text):
 def restaurant(request, rest_id):
     rt = models.Restaurants.objects.filter(id=rest_id).first()  # restaurant
     menu = models.Menu.objects.filter(restaurant_id=rest_id).first()
-    items = models.Items.objects.filter(menu_id=menu.id).all()
+    items = models.Items.objects.filter(menu_id=menu.id).all().order_by('type')
     context = {
         'name': rt.name,
         'idd': rt.id,
         'restaurant': rt,
         'available': rt.total_seats - rt.busy_seats,
-        'pic': rt.photos,
+        'pic': rt.photo,
         'open-time': rt.open_time,
         'close-time': rt.close_time,
         'menu': items
@@ -77,7 +73,7 @@ def reserve(request, idd):
         'idd': rt.id,
         'restaurant': rt,
         'total': rt.total_seats,
-        'pic': rt.photos,
+        'pic': rt.photo,
         'open-time': rt.open_time,
         'close-time': rt.close_time,
         'date': rdate,
@@ -215,7 +211,7 @@ def order(request, id):
         'rest_id': rt.id,
         'restaurant': rt,
         'available': rt.total_seats - rt.busy_seats,
-        'pic': rt.photos,
+        'pic': rt.photo,
         'open-time': rt.open_time,
         'close-time': rt.close_time,
         'menu': items,
@@ -282,3 +278,92 @@ def processOrder(request):
 
 def aboutUs(request):
     return render(request, 'booking/aboutus.html')
+
+
+@login_required()
+def profile(request):
+    return render(request, 'booking/profile.html')
+
+
+@login_required()
+def my_restaurant(request):
+    rest = models.Restaurants.objects.filter(owner=request.user).first()
+    menu = models.Menu.objects.filter(restaurant=rest).first()
+    items = models.Items.objects.filter(menu=menu).all().order_by('type')
+    bookings = models.Bookings.objects.filter(restaurant=rest)
+    orders = models.Orders.objects.filter(booking__in=bookings)
+    order_items = models.OrderItem.objects.filter(order__in=orders)
+    context = {
+        'rest': rest,
+        'menu': menu,
+        'items': items,
+        'bookings': bookings,
+        'orders': orders,
+        'order_items': order_items
+    }
+    return render(request, 'booking/my_restaurant.html', context)
+
+
+@login_required()
+def edit_Restaurant(request):
+    rest = models.Restaurants.objects.filter(owner=request.user).first()
+    rname = request.POST.get('restaurant_name')
+    if rname is not "":
+        rest.name = rname
+    address = request.POST.get('address')
+    if address is not "":
+        rest.address = address
+    total_seats = request.POST.get('total_seats')
+    if total_seats is not "":
+        rest.total_seats = int(total_seats)
+    open_time = request.POST.get('open_time')
+    if open_time is not "":
+        rest.open_time = datetime.strptime(open_time, '%H:%M').time()
+    close_time = request.POST.get('close_time')
+    if close_time is not "":
+        rest.close_time = datetime.strptime(close_time, '%H:%M').time()
+    rest.save()
+    messages.info(request, "The restaurant successfully updated!")
+    return redirect('my_restaurant')
+
+
+@login_required()
+def addToMenu(request):
+    rest = models.Restaurants.objects.filter(owner=request.user).first()
+    menu = models.Menu.objects.filter(restaurant=rest).first()
+    item_name = request.POST.get('item_name')
+    item_price = int(request.POST.get('item_price'))
+    item_type = request.POST.get('item_type')
+    item_description = request.POST.get('item_description')
+
+    item = Items.objects.create(name=item_name, price=item_price, type=item_type, description=item_description, menu_id=menu.id)
+    item.save()
+    return redirect('my_restaurant')
+
+
+@login_required()
+def deleteItem(request, item_id):
+    item = models.Items.objects.filter(id=item_id)
+    item.delete()
+    messages.info(request, "Item was successfully deleted!")
+    return redirect('my_restaurant')
+
+
+@login_required()
+def editItem(request, item_id):
+    item = models.Items.objects.filter(id=item_id).first()
+    item_name = request.POST.get('item_name')
+    if item_name is not "":
+        item.name = item_name
+    item_price = request.POST.get('item_price')
+    if item_price is not "":
+        item.price = int(item_price)
+    item_type = request.POST.get('item_type')
+    if item_type is not "":
+        item.type = item_type
+    item_description = request.POST.get('item_description')
+    if item_description is not "":
+        item.description = item_description
+    item.save()
+    messages.info(request, "The item successfully updated!")
+    return redirect('my_restaurant')

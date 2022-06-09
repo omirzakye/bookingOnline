@@ -15,5 +15,11 @@ urlpatterns = [
     path('add/', addToOrder, name='addToOrder'),
     path('checkout/<int:booking_id>', checkOut, name='checkout'),
     path('process_order/', processOrder, name="process_order"),
-    path('aboutus/', aboutUs, name="about_us")
+    path('aboutus/', aboutUs, name="about_us"),
+    path('profile/', profile, name="profile"),
+    path('myrestaurant/', my_restaurant, name='my_restaurant'),
+    path('myrestaurant/edit/', edit_Restaurant, name='edit_restaurant'),
+    path('add_to_menu/', addToMenu, name='add_to_menu'),
+    path('item/delete/<int:item_id>/', deleteItem, name='delete_item'),
+    path('item/edit/<int:item_id>', editItem, name='edit_item')
 ]

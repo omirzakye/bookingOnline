@@ -74,11 +74,18 @@
               <li class="nav-item active">
                 <a class="nav-link" href="{% url 'home' %}">Home <span class="sr-only">(current)</span></a>
               </li>
+            {% if not user.is_staff %}
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'reservations' %}">My reservations</a>
               </li>
+            {% endif %}
+            {% if user.is_staff %}
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'about_us' %}">Contact us</a>
+                <a class="nav-link" href="{% url 'my_restaurant' %}">My restaurant</a>
+              </li>
+            {% endif %}
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'about_us' %}">About us</a>
               </li>
             </ul>
             <form class="form-inline" action="{% url 'search_rest_by_name' %}" method="post">
@@ -86,12 +93,11 @@
                 <input type="search" name="search_field" class="fa fa-search" placeholder="Search ...">
             </form>
             <div class="user_option">
-              <a href="#MYPROFIIIIILE" class="user_link">
-                <i class="fa fa-user" aria-hidden="true"></i>
-              </a>
                 {%block login%}
                     {% if user.is_authenticated%}
-                        <p style="padding-top: 5%; color: white">{{ user }}</p>
+                        <a href="{% url 'profile' %}" class="user_link">
+                            <i class="fa fa-user" aria-hidden="true"></i> {{ user }}
+                        </a>
                         <a href="{% url 'account_logout' %}" class="order_online">Log out</a>
                     {%else%}
                         <a href="{% url 'account_login' %}">Log in</a>

@@ -1,0 +1,197 @@
+{% extends "booking/base.html" %}
+{% load static %}
+{% block content %}
+    <!-- food section -->
+
+    <section class="food_section layout_padding-bottom">
+        <div class="container">
+            <button onclick="openSettings('restaurantSettings')">settings</button>
+            <button onclick="openSettings('menuSettings')">add to Menu</button>
+
+            <div id="restaurantSettings" style="display: none">
+                <div class="form_container">
+                    <form action="{% url 'edit_restaurant' %}" method="POST">
+                        {% csrf_token %}
+                        <div>
+                            <input type="text" class="form-control" placeholder="{{ rest.name }}" name="restaurant_name"/>
+                        </div>
+                        <div>
+                            <input type="url" class="form-control" placeholder="Restaurant address" name="address"/>
+                        </div>
+                        <div>
+                            <input type="time" class="form-control" placeholder="Open time" name="open_time"/>
+                        </div>
+                        <div>
+                            <input type="time" class="form-control" placeholder="Close time" name="close_time"/>
+                        </div>
+                        <div>
+                            <input type="number" class="form-control" placeholder="Total amount of seats {{ rest.total_seats }}" name="total_seats"/>
+                        </div>
+                        <div class="btn_box">
+                            <button type="submit">
+                                Save changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="menuSettings" style="display: none">
+                <div class="form_container">
+                    <form action="{% url 'add_to_menu' %}" method="POST">
+                        {% csrf_token %}
+                        <div>
+                            <input type="text" class="form-control" placeholder="Name of the new item" name="item_name"/>
+                        </div>
+                        <div>
+                            <input type="number" class="form-control" placeholder="Item price" name="item_price"/>
+                        </div>
+                            <label for="types">Choose the type:</label>
+                            <br>
+                            <select name="item_type" id="types">
+                              <option value="drinks">Drinks</option>
+                              <option value="salads">Salads</option>
+                              <option value="hot-meals">Hot-Meals</option>
+                              <option value="kids-menu">Kids-menu</option>
+                            </select>
+                        <div>
+                            <input type="text" class="form-control" placeholder="Item description" name="item_description"/>
+                        </div>
+                        <br>
+                        <div class="btn_box">
+                            <button type="submit">
+                              Add item
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="heading_container heading_center">
+                <h2>
+                    {{ rest }} Restaurant Menu
+                </h2>
+            </div>
+
+            <ul class="filters_menu">
+                <li class="active" data-filter="*">All</li>
+                <li data-filter=".drinks">Drinks</li>
+                <li data-filter=".hot-meals">Hot-meals</li>
+                <li data-filter=".sweets">Sweets</li>
+                <li data-filter=".kids-menu">Kids menu</li>
+            </ul>
+
+            <div class="filters-content">
+                <div class="row grid">
+                    {% for it in items %}
+                    <h4></h4>
+                    <div class="col-sm-6 col-lg-4 all drinks">
+                        <div class="box">
+                            <div class="img-box">
+                                <img src="{{ it.photo }}" alt="Photo of the food">
+                            </div>
+                            <div class="detail-box">
+                                <h5>
+                                {{ it.name }}
+                                </h5>
+                                <p>
+                                    {{ it.description }}
+                                </p>
+                                <div class="options">
+                                    <h6>
+                                    {{ it.price }} ₸
+                                    </h6>
+                                </div>
+
+                                <button onclick="openSettings('item_edit')">Edit</button>
+                                <a href="{% url 'delete_item' it.id %}">Delete</a>
+
+                                <div id="item_edit" style="display: none">
+                                    <form action="{% url 'edit_item' it.id %}" method="POST">
+                                        {% csrf_token %}
+                                        <input type="text" class="" placeholder="Name of the item" name="item_name"/>
+                                        <input type="number" class="" placeholder="Item price" name="item_price"/>
+                                        <label for="types">Choose the type:</label>
+                                        <br>
+                                        <select name="item_type" id="types">
+                                          <option value="drinks" selected>Drinks</option>
+                                          <option value="salads">Salads</option>
+                                          <option value="hot-meals">Hot-Meals</option>
+                                          <option value="kids-menu">Kids-menu</option>
+                                        </select>
+                                        <br><br>
+                                        <input type="text" class="" placeholder="Item description" name="item_description"/>
+                                        <button type="submit">Save</button>
+                                    </form>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <br>
+            <table class="table table-hover">
+                <h1>Reservations at your Restaurant</h1>
+                <thead>
+                    <tr>
+                        <th scope="col">Fname</th>
+                        <th scope="col">Lname</th>
+                        <th scope="col">Time</th>
+                        <th scope="col">Date</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Phone</th>
+                        <th scope="col">Size</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td>{{ booking.reserverFname }}</td>
+                        <td>{{ booking.reserverLname }}</td>
+                        <td>{{ booking.reserve_time_start }}</td>
+                        <td>{{ booking.reserve_date }}</td>
+                        <td>{{ booking.email }}</td>
+                        <td>{{ booking.phone }}</td>
+                        <td>{{ booking.number_of_people }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+    </div>
+<script>
+    function openSettings(settings){
+        var x = document.getElementById(settings);
+          if (x.style.display === "none") {
+            x.style.display = "block";
+          } else {
+            x.style.display = "none";
+          }
+    }
+
+    function deleteItem(item_id){
+        console.log('Deleting Item')
+
+        let url = '/delete_item/'
+
+        fetch(url, {
+                method:'POST',
+                headers:{
+                    'Content-Type':'application/json',
+                    'X-CSRFToken': csrftoken,
+                },
+                body:JSON.stringify({'item_id': item_id})
+            })
+            .then((response) => {
+               return response.json();
+            })
+            .then((data) => {
+                console.log('data', data)
+                location.reload()
+            })
+        }
+</script>
+{% endblock %}
